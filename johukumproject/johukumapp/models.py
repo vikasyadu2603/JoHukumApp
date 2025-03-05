@@ -13,6 +13,9 @@ from .managers import UserManager  # ✅ Import fixed UserManager
 class BaseModal(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        abstract = True
+
 # ankit start
 class Service(BaseModal):
     service_id = models.AutoField(primary_key=True)  
@@ -77,14 +80,14 @@ class User(AbstractBaseUser,BaseModal):
 
 
 # start 
-class BookingSlot(BaseModal):
+class BookingSlot(models.Model):
     STATUS_CHOICES = (
         ('accepted', 'Accepted'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
         ('rejected', 'Rejected'),
     )
-    booking_id = models.AutoField(max_length=6,unique=True)
+    booking_id = models.AutoField(max_length=6,unique=True,primary_key=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     date_time = models.DateTimeField(auto_now_add=True)
     address = models.TextField(blank=True, null=True)
@@ -96,7 +99,7 @@ class BookingSlot(BaseModal):
             self.booking_id = ''.join(random.choices(string.digits, k=6))
         super().save(*args, **kwargs)
 
-class ConfirmBooking(BaseModal):
+class ConfirmBooking(models.Model):
    service_provider_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='service_provider')
    booking_id = models.ForeignKey(BookingSlot, on_delete=models.CASCADE)
    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
