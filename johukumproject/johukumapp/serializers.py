@@ -17,10 +17,12 @@ class ServiceSerializer(serializers.ModelSerializer):
 # ankit end
 
 # richa start
-
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Service
+        fields='__all__'
 class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True, required=True)  # Add password2 field
-
     class Meta:
         model = User
         fields = '__all__'
@@ -78,3 +80,30 @@ class ConfirmBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConfirmBooking
         fields = '__all__'
+
+
+
+from rest_framework import serializers
+from django.contrib.auth.hashers import make_password
+from .models import User, Service
+
+class User1Serializer(serializers.ModelSerializer):
+    service_id = serializers.PrimaryKeyRelatedField(
+        queryset=Service.objects.all(),
+        many=True
+    )
+
+    class Meta:
+        model = User
+        fields = ['full_name', 'email', 'mobile_no', 'user_type', 'password', 'range_field', 'address', 'service_id']
+
+    def create(self, validated_data):
+        services_data = validated_data.pop('service_id', [])
+        password = validated_data.pop('password', None)
+        user = User(**validated_data)
+        if password is not None:
+            user.set_password(password)
+        user.save()
+        user.service_id.set(services_data)
+        return user
+
