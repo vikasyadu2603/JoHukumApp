@@ -9,6 +9,12 @@ User = get_user_model()
 from rest_framework import serializers
 from .models import User  # Import your User model
 
+# ankit start
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Service
+        fields='__all__'
+# ankit end
 
 # richa start
 
@@ -62,12 +68,7 @@ class LoginSerializer(serializers.Serializer):
             }
         raise serializers.ValidationError("Invalid credentials")
 # richa end
-# ankit start
-class ServiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=Service
-        fields='__all__'
-# ankit end
+
 class BookingSlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookingSlot
