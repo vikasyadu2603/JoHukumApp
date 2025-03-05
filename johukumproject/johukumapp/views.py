@@ -30,14 +30,7 @@ class RegisterView(APIView):
             return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    def get(self,request,pk=None):
-        if pk:
-         object=User.objects.get(pk=pk)
-         sereializedneural=UserSerializer(object)
-         return Response(sereializedneural.data)
-        object=User.objects.all()
-        sereializedneural=UserSerializer(object,many=True)
-        return Response(sereializedneural.data)
+    
 
     def delete(self,request,pk=None):
         if pk:
