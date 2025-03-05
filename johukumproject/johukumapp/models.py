@@ -14,10 +14,9 @@ class BaseModal(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     class Meta:
-        abstract = True
-
+        abstract=True
 # ankit start
-class Service(BaseModal):
+class Service(models.Model):
     service_id = models.AutoField(primary_key=True)  
     image = models.FileField(upload_to='service_images/', max_length=250)  
     service_name = models.CharField(max_length=200)
@@ -31,8 +30,7 @@ class Service(BaseModal):
 # richa start
 
 
-class User(AbstractBaseUser,BaseModal):
-    user_id = models.AutoField(primary_key=True)
+class User(AbstractBaseUser):
     service_id = models.ManyToManyField(Service,null=True,blank=True)
     full_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
@@ -46,7 +44,7 @@ class User(AbstractBaseUser,BaseModal):
     registration_date = models.DateTimeField(auto_now_add=True)
     range_field = models.CharField(max_length=255, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
-
+    today_status=models.BooleanField(default=True)
     objects = UserManager()  # ✅ Use fixed UserManager
 
     USERNAME_FIELD = 'email'

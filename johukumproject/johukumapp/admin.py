@@ -10,7 +10,7 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal Info', {'fields': ('full_name', 'mobile_no', 'address')}),
-        ('Permissions', {'fields': ('is_admin', 'is_active')}),
+        ('Permissions', {'fields': ('is_admin', 'is_active','today_status')}),
         ('Other Info', {'fields': ('user_type', 'referral_code', 'unique_code',  'range_field')}),
     )
     
@@ -21,7 +21,7 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
     search_fields = ('email', 'full_name', 'user_type')
-    ordering = ('user_id',)
+    ordering = ('email',)
     filter_horizontal = ()
     
 
