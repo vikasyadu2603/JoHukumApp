@@ -92,6 +92,7 @@ class BookingSlot(models.Model):
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
     booking_summary = models.TextField(blank=True)
     service_id = models.ManyToManyField(Service,null=True,blank=True)
+    is_booked = models.BooleanField(default=False)
     def save(self, *args, **kwargs):
         if not self.booking_id:
             self.booking_id = ''.join(random.choices(string.digits, k=6))
@@ -105,6 +106,11 @@ class ConfirmBooking(models.Model):
    service_id = models.ManyToManyField(Service,null=True,blank=True)
    is_view = models.BooleanField(default=False)
 
+
+def save(self, *args, **kwargs):
+        if self.booking_id.is_booked:
+            raise ValueError("Booking is already confirmed!")
+        super().save(*args, **kwargs)
    
 # end
     

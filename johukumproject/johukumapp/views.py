@@ -111,15 +111,28 @@ class BookingCreateView(APIView):
         booking = get_object_or_404(BookingSlot, booking_id=booking_id)
         serializer = BookingSlotSerializer(booking)
         return Response(serializer.data)
-# Confirm booking by service provider
 class ConfirmBookingView(APIView):
     # permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        booking_id = request.data.get("booking_id")  # Extract booking ID from request
+        
+        # Check if the booking ID exists and is already booked
+        booking = BookingSlot.objects.filter(pk=booking_id).first()
+        if not booking:
+            return Response({"error": "Invalid booking ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if booking.is_booked:
+            return Response({"error": "This slot is already booked"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Proceed with confirmation and update `is_booked`
         serializer = ConfirmBookingSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            booking.is_booked = True  # Mark slot as booked
+            booking.save()
             return Response({'message': 'Booking confirmed successfully'}, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # List all user bookings
@@ -132,7 +145,7 @@ class ConfirmBookingView(APIView):
     
      serializer = BookingSlotSerializer(bookings, many=True)
      return Response(serializer.data, status=status.HTTP_200_OK)
-
+# search services
 class SearchUserByService(APIView):
     def get(self, request,pk=None):
         if pk:
