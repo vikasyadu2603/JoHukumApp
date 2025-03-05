@@ -1,52 +1,11 @@
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-# from rest_framework import status
-# from django.core.mail import send_mail
-# from django.conf import settings
-# from .models import Booking, ConfirmBooking
-# from .serializers import BookingSerializer, ConfirmBookingSerializer
-
-# # API View for Bookings
-# class BookingAPIView(APIView):
-#     def get(self, request):
-#         bookings = Booking.objects.all()
-#         serializer = BookingSerializer(bookings, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-#     def post(self, request):
-#         serializer = BookingSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# # API View for Confirming Bookings
-# class ConfirmBookingAPIView(APIView):
-#     def get(self, request):
-#         confirmed_bookings = ConfirmBooking.objects.all()
-#         serializer = ConfirmBookingSerializer(confirmed_bookings, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-#     def post(self, request):
-#         serializer = ConfirmBookingSerializer(data=request.data)
-#         if serializer.is_valid():
-#             confirmed_booking = serializer.save()
-
-#             # Send Confirmation Email
-#             subject = "Booking Confirmation"
-#             message = f"Your booking {confirmed_booking.booking.booking_id} has been confirmed.\nAmount: {confirmed_booking.amount}"
-#             send_mail(subject, message, settings.EMAIL_HOST_USER, ["Ourmaill2002@gmail.com"])
-
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # richa start
+
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .models import BookingSlot, ConfirmBooking
-from .serializers import BookingSlotSerializer, ConfirmBookingSerializer
+
 from django.shortcuts import render
 from .models import *
 from rest_framework.views import APIView
@@ -56,9 +15,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
-from .models import *
 from .managers import UserManager
-from .serializers import UserSerializer
+
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
 # ✅ User Registration API
@@ -148,7 +106,7 @@ class BookingCreateView(APIView):
     def post(self, request):
         serializer = BookingSlotSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user_id=request.user)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -161,16 +119,20 @@ class BookingCreateView(APIView):
 class ConfirmBookingView(APIView):
     # permission_classes = [IsAuthenticated]
 
-    def post(self, request, booking_id):
-        booking = get_object_or_404(BookingSlot, booking_id=booking_id)
+    def post(self, request):
         serializer = ConfirmBookingSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(service_provider_id=request.user, booking_id=booking, user_id=booking.user_id)
+            serializer.save()
             return Response({'message': 'Booking confirmed successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # List all user bookings
+  
     def get(self, request):
-        bookings = BookingSlot.objects.filter(user_id=request.user)
-        serializer = BookingSlotSerializer(bookings, many=True)
-        return Response(serializer.data)
+     bookings = BookingSlot.objects.filter()
+    
+     if not bookings.exists():
+        return Response({"message": "No bookings found."}, status=status.HTTP_404_NOT_FOUND)
+    
+     serializer = BookingSlotSerializer(bookings, many=True)
+     return Response(serializer.data, status=status.HTTP_200_OK)
