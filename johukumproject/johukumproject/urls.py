@@ -23,6 +23,7 @@ urlpatterns = [
     path ('service/<pk>/',ServiceView.as_view()),
     path('login/', LoginView.as_view()),
     path('register/', RegisterView.as_view()),
+    path('register/<int:pk>/', RegisterView.as_view()),
      path('bookings/', BookingCreateView.as_view(), name='create-booking'),
     path('confirm-booking/', ConfirmBookingView.as_view(), name='confirm-booking'),
 

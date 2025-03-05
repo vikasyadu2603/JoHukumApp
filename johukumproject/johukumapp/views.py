@@ -72,7 +72,32 @@ class RegisterView(APIView):
             return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get(self,request,pk=None):
+        if pk:
+         object=User.objects.get(pk=pk)
+         sereializedneural=UserSerializer(object)
+         return Response(sereializedneural.data)
+        object=User.objects.all()
+        sereializedneural=UserSerializer(object,many=True)
+        return Response(sereializedneural.data)
 
+    def delete(self,request,pk=None):
+        if pk:
+            object=UserSerializer.objects.get(pk=pk)
+            object.delete()
+            return Response("Delete Succesfull")
+        object=User.delete.all()
+        return Response("All Deleted Successfyll")   
+    def put(self,request,pk):
+        if pk:
+            object=UserSerializer.objects.get(pk=pk)
+            serializedneural=UserSerializer(object,data=request.data,partial=True) #put partial=True after coma in the bracket to initiate partial update "patch operation"
+            #in that you only need to update the needed part while in full update you need to write all the fields wheather needed to update or not 
+            if serializedneural.is_valid():
+                serializedneural.save()
+                return Response(serializedneural.data) 
+            return Response("Invalid")
+    
 
 
 class LoginView(APIView):
@@ -91,6 +116,10 @@ class LoginView(APIView):
                 "message": "Login successful!",
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
+                "user": {
+                    "name": user.full_name,  # If using first_name & last_name fields
+                    "email": user.email
+                    }
             }, status=status.HTTP_200_OK)
 
         return Response({"error": "Invalid credentials!"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -110,13 +139,7 @@ class ServiceView(APIView):
             return Response(new_service.data)
            
 # start
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from rest_framework import status
-from .models import BookingSlot, ConfirmBooking
-from .serializers import BookingSlotSerializer, ConfirmBookingSerializer
+
 
 # Create a booking
 class BookingCreateView(APIView):
