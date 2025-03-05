@@ -27,7 +27,7 @@ urlpatterns = [
     path('bookings/', BookingCreateView.as_view(), name='create-booking'),
     path('bookings/<booking_id>', BookingCreateView.as_view(), name='create-booking'),
     path('confirm-booking/', ConfirmBookingView.as_view(), name='confirm-booking'),
-
+   path('user-search/<int:pk>', SearchUserByService.as_view(), name='confirm-booking'),
 
     # path('api/bookings/', BookingAPIView.as_view(), name='booking_api'),
     # path('api/confirm-booking/', ConfirmBookingAPIView.as_view(), name='confirm_booking_api'),

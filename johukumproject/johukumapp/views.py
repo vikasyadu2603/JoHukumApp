@@ -23,14 +23,16 @@ from django.contrib.auth.hashers import check_password
 class RegisterView(APIView):
     def post(self, request):
         data = request.data
-        serializer = UserSerializer(data=data)
-
+        if data.get("user_type")=="User":
+            serializer = UserSerializer(data=data)
+        else:
+            serializer=User1Serializer(data=data)
         if serializer.is_valid():
             user = serializer.save()
             return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        # return Response(User.objects.all().values('service_id'))
 
     def delete(self,request,pk=None):
         if pk:
@@ -58,22 +60,23 @@ class LoginView(APIView):
 
         try:
             user = User.objects.get(email=email)  # Fetch user manually
+            
         except User.DoesNotExist:
             return Response({"error": "Invalid credentials!"}, status=status.HTTP_401_UNAUTHORIZED)
+        if user.is_active:
+            if check_password(password, user.password):  # Verify password manually
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    "message": "Login successful!",
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                    "user": {
+                        "name": user.full_name,  # If using first_name & last_name fields
+                        "email": user.email
+                        }
+                }, status=status.HTTP_200_OK)
 
-        if check_password(password, user.password):  # Verify password manually
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                "message": "Login successful!",
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-                "user": {
-                    "name": user.full_name,  # If using first_name & last_name fields
-                    "email": user.email
-                    }
-            }, status=status.HTTP_200_OK)
-
-        return Response({"error": "Invalid credentials!"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({"error": "Your Account not activate  please contact to Admin"}, status=status.HTTP_401_UNAUTHORIZED)
 # richa end
 # ankit start
 
@@ -129,3 +132,12 @@ class ConfirmBookingView(APIView):
     
      serializer = BookingSlotSerializer(bookings, many=True)
      return Response(serializer.data, status=status.HTTP_200_OK)
+
+class SearchUserByService(APIView):
+    def get(self, request,pk=None):
+        if pk:
+            user_list=User.objects.filter(service_id=pk,is_active=True,user_type='Service_Provider')
+            user_serializer=UserSerializer(user_list,many=True)
+            return Response(user_serializer.data)
+    
+        

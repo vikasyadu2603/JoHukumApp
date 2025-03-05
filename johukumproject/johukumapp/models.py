@@ -51,7 +51,7 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['full_name', 'user_type']
 
     def _str_(self):
-        return self.email
+        return self.full_name
 
     def has_perm(self, perm, obj=None):
         return self.is_admin
