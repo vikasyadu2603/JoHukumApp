@@ -34,22 +34,22 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         # return Response(User.objects.all().values('service_id'))
 
-    def delete(self,request,pk=None):
+    def delete(self, request, pk=None):
         if pk:
-            object=UserSerializer.objects.get(pk=pk)
-            object.delete()
-            return Response("Delete Succesfull")
-        object=User.delete.all()
-        return Response("All Deleted Successfyll")   
-    def put(self,request,pk):
-        if pk:
-            object=UserSerializer.objects.get(pk=pk)
-            serializedneural=UserSerializer(object,data=request.data,partial=True) #put partial=True after coma in the bracket to initiate partial update "patch operation"
-            #in that you only need to update the needed part while in full update you need to write all the fields wheather needed to update or not 
-            if serializedneural.is_valid():
-                serializedneural.save()
-                return Response(serializedneural.data) 
-            return Response("Invalid")
+            obj = get_object_or_404(User, pk=pk)  # Use the User model
+            obj.delete()
+            return Response({"message": "Delete Successful"}, status=200)
+
+        User.objects.all().delete()  # Delete all users
+        return Response({"message": "All users deleted successfully"}, status=200)
+    
+    def put(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
     
 
 
