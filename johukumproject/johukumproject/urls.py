@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from johukumapp.views import *
+from django.views.generic import RedirectView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('service/', ServiceView.as_view()),
@@ -28,7 +29,7 @@ urlpatterns = [
     path('bookings/<booking_id>', BookingCreateView.as_view(), name='create-booking'),
     path('confirm-booking/', ConfirmBookingView.as_view(), name='confirm-booking'),
    path('user-search/<int:pk>', SearchUserByService.as_view(), name='confirm-booking'),
-
+    path('logout/',RedirectView.as_view(url='admin/logout/'),name='LogOut')
     # path('api/bookings/', BookingAPIView.as_view(), name='booking_api'),
     # path('api/confirm-booking/', ConfirmBookingAPIView.as_view(), name='confirm_booking_api'),
 ]
